@@ -43,6 +43,14 @@ constexpr std::uint64_t CONTROLLER_U_VR = 2;
 constexpr std::uint64_t CONTROLLER_R_VR = 3;
 constexpr std::uint64_t CONTROLLER_KP_VR = 4;
 constexpr std::uint64_t CONTROLLER_BIAS_VR = 5;
+constexpr std::uint64_t CONTROLLER_KI_VR = 6;
+
+constexpr fmi2demo::ValueReference PI_R_VR = 0;
+constexpr fmi2demo::ValueReference PI_Y_VR = 1;
+constexpr fmi2demo::ValueReference PI_U_VR = 2;
+constexpr fmi2demo::ValueReference PI_KP_VR = 3;
+constexpr fmi2demo::ValueReference PI_KI_VR = 4;
+constexpr fmi2demo::ValueReference PI_BIAS_VR = 5;
 
 constexpr std::uint64_t TANK_U_VR = 1;
 constexpr std::uint64_t TANK_H_VR = 2;
@@ -94,13 +102,14 @@ void setCommonMetadata(SlaveDescription_t& d, const std::string& description) {
 SlaveDescription_t makeDescription(bool controller) {
     if (controller) {
         auto d = make_SlaveDescription(1, 0, "TankLevelController", CONTROLLER_UUID);
-        setCommonMetadata(d, "P controller FMU exposed as a DCP NRT slave. The reference is a DCP parameter.");
+        setCommonMetadata(d, "PI controller FMU exposed as a DCP NRT slave. The reference is a DCP parameter.");
         d.TransportProtocols.UDP_IPv4->Control = make_Control_ptr(HOST, CONTROLLER_CONTROL_PORT);
         d.Variables.push_back(make_Variable_input("y", CONTROLLER_Y_VR, floatInput(0.40, "m")));
         d.Variables.push_back(make_Variable_output("u", CONTROLLER_U_VR, floatOutput(0.245, "1")));
         d.Variables.push_back(make_Variable_parameter("r", CONTROLLER_R_VR, floatInput(0.43, "m")));
         d.Variables.push_back(make_Variable_parameter("Kp", CONTROLLER_KP_VR, floatInput(1.5)));
         d.Variables.push_back(make_Variable_parameter("uBias", CONTROLLER_BIAS_VR, floatInput(0.2)));
+        d.Variables.push_back(make_Variable_parameter("Ki", CONTROLLER_KI_VR, floatInput(0.05, "1/s")));
         return d;
     }
 
@@ -182,6 +191,7 @@ private:
             r_ = manager_->getParameter<float64_t*>(CONTROLLER_R_VR);
             kp_ = manager_->getParameter<float64_t*>(CONTROLLER_KP_VR);
             bias_ = manager_->getParameter<float64_t*>(CONTROLLER_BIAS_VR);
+            ki_ = manager_->getParameter<float64_t*>(CONTROLLER_KI_VR);
         } else {
             u_ = manager_->getInput<float64_t*>(TANK_U_VR);
             h_ = manager_->getOutput<float64_t*>(TANK_H_VR);
@@ -199,15 +209,15 @@ private:
 
     void initialize() {
         if (controller_) {
-            fmu_ = std::make_unique<fmi2demo::Runtime>(fmuDir_, "PController",
-                "{dd60dd62-4273-4d99-a069-9019b4743b53}", 120.0);
+            fmu_ = std::make_unique<fmi2demo::Runtime>(fmuDir_, "PIController",
+                "{792dcd94-8268-4d64-b170-38a9212e2806}", 120.0);
             fmu_->instantiate("controller_instance");
             fmu_->setupExperiment();
-            fmu_->setReals({3, 4}, {*kp_, *bias_});
-            fmu_->setReals({0, 1}, {*r_, *y_});
+            fmu_->setReals({PI_KP_VR, PI_KI_VR, PI_BIAS_VR}, {*kp_, *ki_, *bias_});
+            fmu_->setReals({PI_R_VR, PI_Y_VR}, {*r_, *y_});
             fmu_->enterInitializationMode();
             fmu_->exitInitializationMode();
-            *u_ = fmu_->getReal(2);
+            *u_ = fmu_->getReal(PI_U_VR);
             csv_ << "0," << *r_ << "," << *y_ << "," << *u_ << "," << *u_ * 0.001 << '\n';
         } else {
             fmu_ = std::make_unique<fmi2demo::Runtime>(fmuDir_, "Tank",
@@ -221,7 +231,8 @@ private:
             *h_ = fmu_->getReal(1);
             csv_ << "0," << *u_ << "," << *u_ * 0.001 << "," << *h_ << '\n';
         }
-        std::cout << (controller_ ? "[Controller]" : "[Tank]") << " FMI model initialized" << std::endl;
+        std::cout << (controller_ ? "[Controller] PIController" : "[Tank] Tank")
+                  << " FMU initialized" << std::endl;
     }
 
     void waitForInput() {
@@ -238,9 +249,9 @@ private:
             const double dt = (static_cast<double>(timeNumerator_) / timeDenominator_) * steps;
             if (controller_) {
                 const double measuredLevel = delayedInput(*y_, 0.40, delayedFeedback_);
-                fmu_->setReals({0, 1}, {*r_, measuredLevel});
+                fmu_->setReals({PI_R_VR, PI_Y_VR}, {*r_, measuredLevel});
                 fmu_->doStep(dt);
-                *u_ = fmu_->getReal(2);
+                *u_ = fmu_->getReal(PI_U_VR);
                 const auto t = fmu_->time();
                 csv_ << t << ',' << *r_ << ',' << measuredLevel << ',' << *u_ << ',' << *u_ * 0.001 << '\n';
                 if (static_cast<int>(t) % 10 == 0)
@@ -285,6 +296,7 @@ private:
     float64_t* h_ = nullptr;
     float64_t* r_ = nullptr;
     float64_t* kp_ = nullptr;
+    float64_t* ki_ = nullptr;
     float64_t* bias_ = nullptr;
     float64_t* area_ = nullptr;
     float64_t* k_ = nullptr;

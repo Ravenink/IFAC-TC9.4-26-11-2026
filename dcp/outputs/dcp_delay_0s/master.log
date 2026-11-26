@@ -1,0 +1,16 @@
+DCP master: NRT simulation on localhost, duration=120 s, H=1 s, 120 exchanges, signal delay=0 s each way; reference=0.43 m
+DCP master: initialized and exchanged initial outputs
+DCP master: t=10/120 s, exchanges=10/120
+DCP master: t=20/120 s, exchanges=20/120
+DCP master: t=30/120 s, exchanges=30/120
+DCP master: t=40/120 s, exchanges=40/120
+DCP master: t=50/120 s, exchanges=50/120
+DCP master: t=60/120 s, exchanges=60/120
+DCP master: t=70/120 s, exchanges=70/120
+DCP master: t=80/120 s, exchanges=80/120
+DCP master: t=90/120 s, exchanges=90/120
+DCP master: t=100/120 s, exchanges=100/120
+DCP master: t=110/120 s, exchanges=110/120
+DCP master: t=120/120 s, exchanges=120/120
+DCP master: stopping participants
+DCP master: stopped cleanly. Results are in outputs/

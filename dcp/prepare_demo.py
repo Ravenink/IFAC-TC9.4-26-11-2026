@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -6,11 +7,15 @@ ROOT = Path(__file__).resolve().parent
 BUILD = ROOT / "build"
 
 
-def extract_fmu(filename: str, folder: str) -> Path:
-    archive = ROOT / "fmus" / filename
-    destination = BUILD / "fmus" / folder
+def extract_fmu(archive: Path) -> Path:
+    destination = BUILD / "fmus" / archive.stem
     destination.mkdir(parents=True, exist_ok=True)
+    binary = (f"binaries/win64/{archive.stem}.dll" if os.name == "nt"
+              else f"binaries/linux64/{archive.stem}.so")
     with ZipFile(archive) as zf:
+        for required in ("modelDescription.xml", binary):
+            if required not in zf.namelist():
+                raise RuntimeError(f"{archive}: missing {required}")
         for member in zf.infolist():
             target = (destination / member.filename).resolve()
             if destination.resolve() not in target.parents and target != destination.resolve():
@@ -22,20 +27,11 @@ def extract_fmu(filename: str, folder: str) -> Path:
 
 
 def main() -> None:
-    controller = extract_fmu("PController.fmu", "PController")
-    tank = extract_fmu("Tank.fmu", "Tank")
-    if __import__("os").name == "nt":
-        expected = [(controller, "PController.dll"), (tank, "Tank.dll")]
-        binary_folder = "win64"
-    else:
-        expected = [(controller, "PController.so"), (tank, "Tank.so")]
-        binary_folder = "linux64"
-    for folder, binary in expected:
-        path = folder / "binaries" / binary_folder / binary
-        if not path.is_file():
-            raise RuntimeError(f"The FMU has no {binary_folder} binary: {path}")
+    controller_archive = ROOT.parent / "PIController.fmu"
+    controller = extract_fmu(controller_archive)
+    tank = extract_fmu(ROOT / "fmus" / "Tank.fmu")
     print("FMUs extracted and ready:")
-    print(f"  Controller: {controller}")
+    print(f"  Controller: {controller_archive} -> {controller}")
     print(f"  Tank:       {tank}")
 
 

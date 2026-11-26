@@ -25,8 +25,7 @@ def main():
         output=["h"],
     )
     time, level = result["time"], result["h"]
-    print(f"\nWater level: {100 * level[0]:.2f} cm initially, "
-          f"{100 * level[-1]:.3f} cm at {time[-1]:g} s.")
+
     if args.no_show and args.output is None:
         return
 

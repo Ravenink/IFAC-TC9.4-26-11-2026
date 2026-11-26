@@ -1,0 +1,10 @@
+^C:\USERS\LDELA\ONEDRIVE - UNED\DESKTOP\WEBINAR IFAC\DCP\BUILD\WINDOWS\CMAKEFILES\81D9224FADC5CFF2CC89F5976F27E27E\GENERATE.STAMP.RULE
+setlocal
+C:\Users\ldela\AppData\Roaming\Python\Python313\site-packages\cmake\data\bin\cmake.exe "-SC:/Users/ldela/OneDrive - UNED/Desktop/Webinar IFAC/DCP" "-BC:/Users/ldela/OneDrive - UNED/Desktop/Webinar IFAC/DCP/build/windows" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/ldela/OneDrive - UNED/Desktop/Webinar IFAC/DCP/build/windows/DecentraLabsLocalDCPDemo.slnx"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<fmiModelDescription fmiVersion="2.0" modelName="PIController" guid="{792dcd94-8268-4d64-b170-38a9212e2806}" generationTool="DecentraLabs educational PI controller" variableNamingConvention="flat" numberOfEventIndicators="0">
+  <CoSimulation modelIdentifier="PIController" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="false" canGetAndSetFMUstate="false" canSerializeFMUstate="false" providesDirectionalDerivative="false"/>
+  <UnitDefinitions>
+    <Unit name="1">
+      <BaseUnit/>
+    </Unit>
+    <Unit name="1/s">
+      <BaseUnit s="-1"/>
+    </Unit>
+  </UnitDefinitions>
+  <DefaultExperiment startTime="0" stopTime="120" stepSize="1"/>
+  <ModelVariables>
+    <ScalarVariable name="r" valueReference="0" causality="input" variability="continuous" description="Normalized reference, on the same scale as y.">
+      <Real unit="1" start="0"/>
+    </ScalarVariable>
+    <ScalarVariable name="y" valueReference="1" causality="input" variability="continuous" description="Normalized measurement, on the same scale as r.">
+      <Real unit="1" start="0"/>
+    </ScalarVariable>
+    <ScalarVariable name="u" valueReference="2" causality="output" variability="continuous" initial="calculated" description="Normalized control command. The system assembly defines the physical output scale.">
+      <Real unit="1"/>
+    </ScalarVariable>
+    <ScalarVariable name="Kp" valueReference="3" causality="parameter" variability="fixed" initial="exact" description="Proportional gain for normalized signals.">
+      <Real unit="1" start="1.5"/>
+    </ScalarVariable>
+    <ScalarVariable name="Ki" valueReference="4" causality="parameter" variability="fixed" initial="exact" description="Integral gain for normalized signals, per second.">
+      <Real unit="1/s" start="0.05"/>
+    </ScalarVariable>
+    <ScalarVariable name="uBias" valueReference="5" causality="parameter" variability="fixed" initial="exact" description="Constant bias in normalized control units.">
+      <Real unit="1" start="0.2"/>
+    </ScalarVariable>
+  </ModelVariables>
+  <ModelStructure>
+    <Outputs>
+      <Unknown index="3" dependencies="1 2 4 5 6"/>
+    </Outputs>
+    <InitialUnknowns>
+      <Unknown index="3" dependencies="1 2 4 5 6"/>
+    </InitialUnknowns>
+  </ModelStructure>
+</fmiModelDescription>

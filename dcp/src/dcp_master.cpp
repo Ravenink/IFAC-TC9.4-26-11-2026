@@ -50,6 +50,7 @@ constexpr std::uint64_t CONTROLLER_U_VR = 2;
 constexpr std::uint64_t CONTROLLER_R_VR = 3;
 constexpr std::uint64_t CONTROLLER_KP_VR = 4;
 constexpr std::uint64_t CONTROLLER_BIAS_VR = 5;
+constexpr std::uint64_t CONTROLLER_KI_VR = 6;
 
 constexpr std::uint64_t TANK_U_VR = 1;
 constexpr std::uint64_t TANK_H_VR = 2;
@@ -66,7 +67,7 @@ public:
         manager_ = std::make_unique<DcpManagerMaster>(driver_->getDcpDriver());
         setSlaveEndpoint(CONTROLLER_ID, CONTROLLER_CONTROL_PORT);
         setSlaveEndpoint(TANK_ID, TANK_CONTROL_PORT);
-        expectedAcks_[CONTROLLER_ID] = 11;
+        expectedAcks_[CONTROLLER_ID] = 12;
         expectedAcks_[TANK_ID] = 11;
 
         manager_->setAckReceivedListener<SYNC>([this](std::uint8_t sender, std::uint16_t) {
@@ -136,6 +137,7 @@ private:
         setFloatParameter(CONTROLLER_ID, CONTROLLER_R_VR, reference_);
         setFloatParameter(CONTROLLER_ID, CONTROLLER_KP_VR, 1.5);
         setFloatParameter(CONTROLLER_ID, CONTROLLER_BIAS_VR, 0.2);
+        setFloatParameter(CONTROLLER_ID, CONTROLLER_KI_VR, 0.05);
     }
 
     void configureTank() {

@@ -1,4 +1,4 @@
-"""Compare P and PI control for TwoTankController.ssp using an FMI 2.0 master."""
+"""Simulate PI control of two tanks using the FMUs packaged in the SSP."""
 
 import argparse
 import csv
@@ -206,34 +206,29 @@ def print_assembly(assembly):
         print(f"  {source:15s} -> {target:15s}  factor={link.factor:g}  offset={link.offset:g}")
 
 
-def write_comparison_csv(file, p_run, pi_run):
-    if [row[0] for row in p_run] != [row[0] for row in pi_run]:
-        raise ValueError("P and PI runs must use the same time grid.")
+def write_trace_csv(file, samples):
     with file.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.writer(stream)
-        writer.writerow(("time_s", "h1_P_m", "h2_P_m", "qPump_P_L_s", "q12_P_L_s",
-                         "h1_PI_m", "h2_PI_m", "qPump_PI_L_s", "q12_PI_L_s"))
-        for p, pi in zip(p_run, pi_run):
-            writer.writerow((p[0], p[1], p[2], 1000 * p[3], 1000 * p[4],
-                             pi[1], pi[2], 1000 * pi[3], 1000 * pi[4]))
+        writer.writerow(("time_s", "h1_m", "h2_m", "qPump_L_s", "q12_L_s"))
+        writer.writerows((time, h1, h2, 1000 * pump_flow, 1000 * transfer_flow)
+                         for time, h1, h2, pump_flow, transfer_flow in samples)
 
 
-def plot_comparison(plt, p_run, pi_run, h_ref, kp, ki, output):
-    colors = {"P": "#007E87", "PI": "#BC4E2F"}
+def plot_pi(plt, samples, h_ref, kp, ki, output):
+    colors = {"tank1": "#187A89", "tank2": "#D65A36"}
     fig, (ax_level, ax_flow) = plt.subplots(2, 1, sharex=True, figsize=(10.5, 7.5),
                                             layout="constrained")
-    fig.suptitle(f"Two-tank level control: P vs PI (Kp = {kp:g}, Ki = {ki:g})", fontsize=15)
-    for label, samples, color in (("P", p_run, colors["P"]), ("PI", pi_run, colors["PI"])):
-        time, h1, h2, pump_flow, transfer_flow = zip(*samples)
-        ax_level.plot(time, [100 * h for h in h1], color=color, lw=2.0,
-                      label=f"Tank 1 — {label}")
-        ax_level.plot(time, [100 * h for h in h2], color=color, lw=2.0, linestyle="--",
-                      label=f"Tank 2 — {label}")
-        ax_flow.stairs([1000 * q for q in pump_flow[:-1]], time, baseline=None,
-                       color=color, lw=1.9, label=f"Pump flow — {label}")
-        ax_flow.stairs([1000 * q for q in transfer_flow[:-1]], time, baseline=None,
-                       color=color, lw=1.9, linestyle="--", label=f"Tank-to-tank flow — {label}")
-    time = [row[0] for row in p_run]
+    fig.suptitle(f"Two-tank PI level control (Kp = {kp:g}, Ki = {ki:g})", fontsize=15)
+    time, h1, h2, pump_flow, transfer_flow = zip(*samples)
+    ax_level.plot(time, [100 * h for h in h1], color=colors["tank1"], lw=2.2,
+                  label="Tank 1 level")
+    ax_level.plot(time, [100 * h for h in h2], color=colors["tank2"], lw=2.2,
+                  linestyle="--", label="Tank 2 level")
+    ax_flow.stairs([1000 * q for q in pump_flow[:-1]], time, baseline=None,
+                   color=colors["tank1"], lw=2.0, label="Pump flow")
+    ax_flow.stairs([1000 * q for q in transfer_flow[:-1]], time, baseline=None,
+                   color=colors["tank2"], lw=2.0, linestyle="--",
+                   label="Tank-to-tank flow")
     ax_level.axhline(100 * h_ref, color="#546976", linestyle=":", lw=1.8,
                      label=f"Tank 2 setpoint ({100 * h_ref:g} cm)")
     ax_level.set(ylabel="Water level (cm)")
@@ -242,11 +237,11 @@ def plot_comparison(plt, p_run, pi_run, h_ref, kp, ki, output):
         ax.grid(alpha=0.24)
         ax.legend(loc="best", ncol=2, fontsize=9)
     if output:
-        fig.savefig(output / "two_tanks_P_vs_PI.png", dpi=180)
+        fig.savefig(output / "two_tanks_PI.png", dpi=180)
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Simulate PI control for TwoTankController.ssp.")
     parser.add_argument("mode", nargs="?", default="run", choices=("run", "info"))
     parser.add_argument("--ssp", type=Path, default=HERE / "TwoTankController.ssp",
                         help="SSP package or path to an unpacked SystemStructure.ssd")
@@ -254,11 +249,11 @@ def main():
                         help="closed-loop communication step in seconds (default: 1)")
     parser.add_argument("--href-cm", type=float, default=43.0, help="tank 2 setpoint in cm")
     parser.add_argument("--duration", type=float, help="override the SSP stop time")
-    parser.add_argument("--kp", type=float, help="override Kp from Controller.ssv for both runs")
-    parser.add_argument("--ki", type=float, help="override Ki from Controller.ssv for the PI run")
-    parser.add_argument("--output", type=Path, metavar="DIR", help="save a PNG figure and comparison CSV")
+    parser.add_argument("--kp", type=float, help="override Kp from Controller.ssv")
+    parser.add_argument("--ki", type=float, help="override Ki from Controller.ssv")
+    parser.add_argument("--output", type=Path, metavar="DIR", help="save a PNG figure and PI trace CSV")
     parser.add_argument("--no-show", action="store_true", help="run without opening a plot window")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if (not isfinite(args.href_cm) or not isfinite(args.step) or args.step <= 0 or
             (args.kp is not None and not isfinite(args.kp)) or
             (args.ki is not None and not isfinite(args.ki)) or
@@ -281,20 +276,23 @@ def run(args):
         controller_params = assembly[0]["Controller"][1]
         kp = controller_params["Kp"] if args.kp is None else args.kp
         ki = controller_params["Ki"] if args.ki is None else args.ki
-        p_run = run_closed_loop(assembly, h_ref=h_ref, step=args.step, kp=kp, ki=0.0,
-                                duration=args.duration)
-        pi_run = run_closed_loop(assembly, h_ref=h_ref, step=args.step, kp=kp, ki=ki,
-                                 duration=args.duration)
-        print(f"Two tanks: tank 2 setpoint={args.href_cm:g} cm, Kp={kp:g} L/s/m, "
-              f"PI Ki={ki:g} L/s/m/s, H={args.step:g} s")
-        for label, samples in (("P", p_run), ("PI", pi_run)):
-            end, h1, h2, _, _ = samples[-1]
-            print(f"  {label}: at t={end:g} s, h1={100 * h1:.3f} cm, h2={100 * h2:.3f} cm, "
-                  f"tank 2 error={100 * (h_ref - h2):.3f} cm")
+        samples = run_closed_loop(assembly, h_ref=h_ref, step=args.step, kp=kp, ki=ki,
+                                  duration=args.duration)
+        controller_path = assembly[0]["Controller"][0]
+        controller_model = read_model_description(str(controller_path))
+        gain_units = {v.name: v.unit for v in controller_model.modelVariables
+                      if v.name in {"Kp", "Ki"}}
+        kp_unit = f" [{gain_units['Kp']}]" if gain_units.get("Kp") else ""
+        ki_unit = f" [{gain_units['Ki']}]" if gain_units.get("Ki") else ""
+        print(f"Two tanks: tank 2 setpoint={args.href_cm:g} cm, Kp={kp:g}{kp_unit}, "
+              f"PI Ki={ki:g}{ki_unit}, H={args.step:g} s")
+        end, h1, h2, _, _ = samples[-1]
+        print(f"  PI: at t={end:g} s, h1={100 * h1:.3f} cm, h2={100 * h2:.3f} cm, "
+              f"tank 2 error={100 * (h_ref - h2):.3f} cm")
 
     if args.output is not None:
         args.output.mkdir(parents=True, exist_ok=True)
-        write_comparison_csv(args.output / "two_tanks_P_vs_PI.csv", p_run, pi_run)
+        write_trace_csv(args.output / "two_tanks_PI.csv", samples)
     if args.no_show and args.output is None:
         return
     import matplotlib
@@ -302,7 +300,7 @@ def run(args):
     if args.no_show:
         matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    plot_comparison(plt, p_run, pi_run, h_ref, kp, ki, args.output)
+    plot_pi(plt, samples, h_ref, kp, ki, args.output)
     if not args.no_show:
         plt.show()
 

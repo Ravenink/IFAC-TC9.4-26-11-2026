@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tank control | DCP</title>
+<style>
+:root{color-scheme:light;--ink:#13243a;--muted:#5e6c80;--line:#d8e0e9;--teal:#0f766e;--page:#f3f6fa}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:16px/1.35 "Segoe UI",Arial,sans-serif}
+main{max-width:1140px;margin:24px auto;padding:0 18px 32px}h1{font-size:clamp(36px,6vw,62px);line-height:1;margin:0 0 18px;letter-spacing:-1.8px}h2{font-size:20px;margin:0 0 14px}p{margin:0;color:var(--muted)}
+.card,.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 5px 20px #17203308}
+.card-title{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:12px}.card-title strong{font-size:25px}.card-title span{font-size:14px;color:var(--muted)}
+.master{max-width:360px;margin:0 auto 8px;text-align:center;background:#edf4fa;border:1px solid #bfd0e0}.box{border:1px solid var(--line);border-radius:11px;padding:12px 10px;background:#fbfdff;text-align:center;font-size:18px;font-weight:800}.box small{display:block;font-size:13px;font-weight:450;color:var(--muted);margin-top:3px}.control{text-align:center;color:var(--muted);font-size:13px;margin-bottom:7px}
+.dcp-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,.9fr) minmax(0,1fr);gap:9px;align-items:center}.controller{border-top:4px solid var(--teal)}.plant{border-top:4px solid #2563eb}.channel{border:1px solid #b8c8d6;border-radius:12px;background:#f7fafc;padding:10px 7px;text-align:center}.channel strong{font-size:15px;color:#21445a}.channel small{display:block;margin-top:3px;color:var(--muted);font-size:12px}
+.panel{margin-top:14px}.controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}.controls label{font-size:16px;font-weight:800}.controls select{min-width:130px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:10px 14px;font:inherit;font-size:19px;font-weight:800}.direction{font-size:20px;font-weight:800;color:var(--teal)}.meta{font-size:13px;margin:-2px 0 12px}.chart{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}.chart svg{display:block;width:100%;height:auto}.legend{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin:10px 0 12px;font-size:14px;font-weight:650;color:#394b61}.key{width:28px;display:inline-block;vertical-align:middle;margin-right:6px}.key.dcp{border-top:4px solid var(--teal);border-radius:3px}.key.setpoint{border-top:2px dashed #526277}.note{font-size:13px;margin-top:10px}
+@media(max-width:790px){main{margin:16px auto;padding:0 12px 22px}}
+@media(max-width:520px){.card,.panel{padding:13px}.dcp-row{grid-template-columns:1fr}.controls{align-items:flex-start;flex-direction:column;gap:7px}.direction{font-size:17px}}
+</style></head><body><main>
+<h1>DCP tank control</h1>
+<section class="card"><div class="card-title"><strong>Local DCP setup</strong><span>3 processes · UDP</span></div>
+    <div class="box master">DCP MASTER<small>configure · synchronize · step</small></div>
+    <div class="control">control and step commands</div>
+    <div class="dcp-row">
+      <div class="box controller">PI CONTROLLER<small>PIController.fmu</small></div>
+      <div class="channel"><strong>u &rarr; · h &larr;</strong><small>data exchange<br>delay D each way</small></div>
+      <div class="box plant">TANK<small>Tank.fmu</small></div>
+    </div>
+</section>
+<section class="panel">
+  <h2>Tank level by signal delay</h2>
+  <div class="controls"><label for="delay">One-way signal delay</label><select id="delay"><option value="0" selected>0 s</option><option value="2">2 s</option><option value="5">5 s</option><option value="10">10 s</option></select><span class="direction" id="direction"></span></div>
+  <p class="meta">DCP communication step 1 s · Setpoint 43 cm</p>
+  <div class="legend"><span><i class="key dcp"></i>Tank level</span><span><i class="key setpoint"></i>Setpoint</span></div>
+  <section class="trace" data-trace="0">
+  <div class="chart"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-label="Tank level and setpoint under PI control over DCP">
+<style>text{font-family:Segoe UI,Arial,sans-serif;fill:#34445b}.axis{stroke:#748198;stroke-width:1.2}.grid{stroke:#e5eaf1;stroke-width:1}.tick{font-size:11px;fill:#637187}</style>
+<line x1="78" y1="362.0" x2="952" y2="362.0" class="grid"/>
+<text x="68" y="366.0" text-anchor="end" class="tick">39.4</text>
+<line x1="78" y1="283.5" x2="952" y2="283.5" class="grid"/>
+<text x="68" y="287.5" text-anchor="end" class="tick">40.5</text>
+<line x1="78" y1="205.0" x2="952" y2="205.0" class="grid"/>
+<text x="68" y="209.0" text-anchor="end" class="tick">41.5</text>
+<line x1="78" y1="126.5" x2="952" y2="126.5" class="grid"/>
+<text x="68" y="130.5" text-anchor="end" class="tick">42.5</text>
+<line x1="78" y1="48.0" x2="952" y2="48.0" class="grid"/>
+<text x="68" y="52.0" text-anchor="end" class="tick">43.6</text>
+<line x1="78.0" y1="48" x2="78.0" y2="362" class="grid"/>
+<text x="78.0" y="383" text-anchor="middle" class="tick">0</text>
+<line x1="223.7" y1="48" x2="223.7" y2="362" class="grid"/>
+<text x="223.7" y="383" text-anchor="middle" class="tick">20</text>
+<line x1="369.3" y1="48" x2="369.3" y2="362" class="grid"/>
+<text x="369.3" y="383" text-anchor="middle" class="tick">40</text>
+<line x1="515.0" y1="48" x2="515.0" y2="362" class="grid"/>
+<text x="515.0" y="383" text-anchor="middle" class="tick">60</text>
+<line x1="660.7" y1="48" x2="660.7" y2="362" class="grid"/>
+<text x="660.7" y="383" text-anchor="middle" class="tick">80</text>
+<line x1="806.3" y1="48" x2="806.3" y2="362" class="grid"/>
+<text x="806.3" y="383" text-anchor="middle" class="tick">100</text>
+<line x1="952.0" y1="48" x2="952.0" y2="362" class="grid"/>
+<text x="952.0" y="383" text-anchor="middle" class="tick">120</text>
+<line x1="78" y1="48" x2="78" y2="362" class="axis"/>
+<line x1="78" y1="362" x2="952" y2="362" class="axis"/>
+<text x="515.0" y="405" text-anchor="middle">Time (s)</text>
+<text transform="translate(23 210.0) rotate(-90)" text-anchor="middle">Tank level (cm)</text>
+<line x1="78" y1="92.9" x2="952" y2="92.9" stroke="#526277" stroke-width="1.6" stroke-dasharray="5 6"/>
+<polyline points="78.0,317.1 85.3,283.2 92.6,254.9 99.8,231.3 107.1,211.5 114.4,195.0 121.7,181.1 129.0,169.5 136.3,159.8 143.6,151.6 150.8,144.7 158.1,138.9 165.4,133.9 172.7,129.7 180.0,126.2 187.2,123.2 194.5,120.6 201.8,118.3 209.1,116.4 216.4,114.7 223.7,113.3 230.9,112.0 238.2,110.9 245.5,109.9 252.8,109.0 260.1,108.2 267.4,107.5 274.6,106.9 281.9,106.3 289.2,105.7 296.5,105.2 303.8,104.7 311.1,104.3 318.4,103.9 325.6,103.5 332.9,103.2 340.2,102.8 347.5,102.5 354.8,102.2 362.1,101.9 369.3,101.6 376.6,101.3 383.9,101.1 391.2,100.8 398.5,100.6 405.8,100.4 413.0,100.1 420.3,99.9 427.6,99.7 434.9,99.5 442.2,99.3 449.4,99.1 456.7,98.9 464.0,98.8 471.3,98.6 478.6,98.4 485.9,98.3 493.1,98.1 500.4,98.0 507.7,97.8 515.0,97.7 522.3,97.5 529.6,97.4 536.9,97.3 544.1,97.1 551.4,97.0 558.7,96.9 566.0,96.8 573.3,96.7 580.5,96.5 587.8,96.4 595.1,96.3 602.4,96.2 609.7,96.1 617.0,96.0 624.2,95.9 631.5,95.9 638.8,95.8 646.1,95.7 653.4,95.6 660.7,95.5 668.0,95.4 675.2,95.4 682.5,95.3 689.8,95.2 697.1,95.2 704.4,95.1 711.6,95.0 718.9,95.0 726.2,94.9 733.5,94.8 740.8,94.8 748.1,94.7 755.4,94.7 762.6,94.6 769.9,94.6 777.2,94.5 784.5,94.5 791.8,94.4 799.0,94.4 806.3,94.3 813.6,94.3 820.9,94.3 828.2,94.2 835.5,94.2 842.8,94.1 850.0,94.1 857.3,94.1 864.6,94.0 871.9,94.0 879.2,94.0 886.5,93.9 893.7,93.9 901.0,93.9 908.3,93.8 915.6,93.8 922.9,93.8 930.1,93.8 937.4,93.7 944.7,93.7 952.0,93.7" fill="none" stroke="#0f766e" stroke-width="4"/>
+</svg></div>
+</section><section class="trace" data-trace="1" hidden>
+  <div class="chart"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-label="Tank level and setpoint under PI control over DCP">
+<style>text{font-family:Segoe UI,Arial,sans-serif;fill:#34445b}.axis{stroke:#748198;stroke-width:1.2}.grid{stroke:#e5eaf1;stroke-width:1}.tick{font-size:11px;fill:#637187}</style>
+<line x1="78" y1="362.0" x2="952" y2="362.0" class="grid"/>
+<text x="68" y="366.0" text-anchor="end" class="tick">39.4</text>
+<line x1="78" y1="283.5" x2="952" y2="283.5" class="grid"/>
+<text x="68" y="287.5" text-anchor="end" class="tick">40.5</text>
+<line x1="78" y1="205.0" x2="952" y2="205.0" class="grid"/>
+<text x="68" y="209.0" text-anchor="end" class="tick">41.6</text>
+<line x1="78" y1="126.5" x2="952" y2="126.5" class="grid"/>
+<text x="68" y="130.5" text-anchor="end" class="tick">42.6</text>
+<line x1="78" y1="48.0" x2="952" y2="48.0" class="grid"/>
+<text x="68" y="52.0" text-anchor="end" class="tick">43.7</text>
+<line x1="78.0" y1="48" x2="78.0" y2="362" class="grid"/>
+<text x="78.0" y="383" text-anchor="middle" class="tick">0</text>
+<line x1="223.7" y1="48" x2="223.7" y2="362" class="grid"/>
+<text x="223.7" y="383" text-anchor="middle" class="tick">20</text>
+<line x1="369.3" y1="48" x2="369.3" y2="362" class="grid"/>
+<text x="369.3" y="383" text-anchor="middle" class="tick">40</text>
+<line x1="515.0" y1="48" x2="515.0" y2="362" class="grid"/>
+<text x="515.0" y="383" text-anchor="middle" class="tick">60</text>
+<line x1="660.7" y1="48" x2="660.7" y2="362" class="grid"/>
+<text x="660.7" y="383" text-anchor="middle" class="tick">80</text>
+<line x1="806.3" y1="48" x2="806.3" y2="362" class="grid"/>
+<text x="806.3" y="383" text-anchor="middle" class="tick">100</text>
+<line x1="952.0" y1="48" x2="952.0" y2="362" class="grid"/>
+<text x="952.0" y="383" text-anchor="middle" class="tick">120</text>
+<line x1="78" y1="48" x2="78" y2="362" class="axis"/>
+<line x1="78" y1="362" x2="952" y2="362" class="axis"/>
+<text x="515.0" y="405" text-anchor="middle">Time (s)</text>
+<text transform="translate(23 210.0) rotate(-90)" text-anchor="middle">Tank level (cm)</text>
+<line x1="78" y1="100.5" x2="952" y2="100.5" stroke="#526277" stroke-width="1.6" stroke-dasharray="5 6"/>
+<polyline points="78.0,318.4 85.3,286.5 92.6,256.2 99.8,226.3 107.1,196.8 114.4,167.7 121.7,143.6 129.0,124.4 136.3,109.7 143.6,99.6 150.8,93.8 158.1,91.6 165.4,92.1 172.7,94.6 180.0,98.5 187.2,103.1 194.5,107.8 201.8,112.2 209.1,116.1 216.4,119.3 223.7,121.6 230.9,123.1 238.2,123.8 245.5,123.9 252.8,123.4 260.1,122.5 267.4,121.3 274.6,120.0 281.9,118.6 289.2,117.2 296.5,115.9 303.8,114.8 311.1,113.8 318.4,112.9 325.6,112.3 332.9,111.7 340.2,111.3 347.5,111.0 354.8,110.8 362.1,110.6 369.3,110.4 376.6,110.3 383.9,110.1 391.2,110.0 398.5,109.8 405.8,109.6 413.0,109.4 420.3,109.2 427.6,109.0 434.9,108.8 442.2,108.5 449.4,108.3 456.7,108.0 464.0,107.8 471.3,107.5 478.6,107.3 485.9,107.1 493.1,106.9 500.4,106.7 507.7,106.5 515.0,106.3 522.3,106.1 529.6,106.0 536.9,105.8 544.1,105.7 551.4,105.5 558.7,105.4 566.0,105.2 573.3,105.1 580.5,105.0 587.8,104.8 595.1,104.7 602.4,104.6 609.7,104.5 617.0,104.4 624.2,104.2 631.5,104.1 638.8,104.0 646.1,103.9 653.4,103.8 660.7,103.7 668.0,103.6 675.2,103.5 682.5,103.5 689.8,103.4 697.1,103.3 704.4,103.2 711.6,103.1 718.9,103.1 726.2,103.0 733.5,102.9 740.8,102.8 748.1,102.8 755.4,102.7 762.6,102.6 769.9,102.6 777.2,102.5 784.5,102.5 791.8,102.4 799.0,102.4 806.3,102.3 813.6,102.2 820.9,102.2 828.2,102.2 835.5,102.1 842.8,102.1 850.0,102.0 857.3,102.0 864.6,101.9 871.9,101.9 879.2,101.8 886.5,101.8 893.7,101.8 901.0,101.7 908.3,101.7 915.6,101.7 922.9,101.6 930.1,101.6 937.4,101.6 944.7,101.5 952.0,101.5" fill="none" stroke="#0f766e" stroke-width="4"/>
+</svg></div>
+</section><section class="trace" data-trace="2" hidden>
+  <div class="chart"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-label="Tank level and setpoint under PI control over DCP">
+<style>text{font-family:Segoe UI,Arial,sans-serif;fill:#34445b}.axis{stroke:#748198;stroke-width:1.2}.grid{stroke:#e5eaf1;stroke-width:1}.tick{font-size:11px;fill:#637187}</style>
+<line x1="78" y1="362.0" x2="952" y2="362.0" class="grid"/>
+<text x="68" y="366.0" text-anchor="end" class="tick">39.3</text>
+<line x1="78" y1="283.5" x2="952" y2="283.5" class="grid"/>
+<text x="68" y="287.5" text-anchor="end" class="tick">40.9</text>
+<line x1="78" y1="205.0" x2="952" y2="205.0" class="grid"/>
+<text x="68" y="209.0" text-anchor="end" class="tick">42.4</text>
+<line x1="78" y1="126.5" x2="952" y2="126.5" class="grid"/>
+<text x="68" y="130.5" text-anchor="end" class="tick">44.0</text>
+<line x1="78" y1="48.0" x2="952" y2="48.0" class="grid"/>
+<text x="68" y="52.0" text-anchor="end" class="tick">45.6</text>
+<line x1="78.0" y1="48" x2="78.0" y2="362" class="grid"/>
+<text x="78.0" y="383" text-anchor="middle" class="tick">0</text>
+<line x1="223.7" y1="48" x2="223.7" y2="362" class="grid"/>
+<text x="223.7" y="383" text-anchor="middle" class="tick">20</text>
+<line x1="369.3" y1="48" x2="369.3" y2="362" class="grid"/>
+<text x="369.3" y="383" text-anchor="middle" class="tick">40</text>
+<line x1="515.0" y1="48" x2="515.0" y2="362" class="grid"/>
+<text x="515.0" y="383" text-anchor="middle" class="tick">60</text>
+<line x1="660.7" y1="48" x2="660.7" y2="362" class="grid"/>
+<text x="660.7" y="383" text-anchor="middle" class="tick">80</text>
+<line x1="806.3" y1="48" x2="806.3" y2="362" class="grid"/>
+<text x="806.3" y="383" text-anchor="middle" class="tick">100</text>
+<line x1="952.0" y1="48" x2="952.0" y2="362" class="grid"/>
+<text x="952.0" y="383" text-anchor="middle" class="tick">120</text>
+<line x1="78" y1="48" x2="78" y2="362" class="axis"/>
+<line x1="78" y1="362" x2="952" y2="362" class="axis"/>
+<text x="515.0" y="405" text-anchor="middle">Time (s)</text>
+<text transform="translate(23 210.0) rotate(-90)" text-anchor="middle">Tank level (cm)</text>
+<line x1="78" y1="176.9" x2="952" y2="176.9" stroke="#526277" stroke-width="1.6" stroke-dasharray="5 6"/>
+<polyline points="78.0,327.7 85.3,305.6 92.6,284.6 99.8,264.7 107.1,245.7 114.4,227.6 121.7,209.7 129.0,191.9 136.3,174.3 143.6,156.8 150.8,139.4 158.1,122.1 165.4,108.2 172.7,97.5 180.0,89.7 187.2,84.7 194.5,82.3 201.8,82.5 209.1,85.1 216.4,90.1 223.7,97.6 230.9,107.3 238.2,119.3 245.5,133.1 252.8,148.1 260.1,164.0 267.4,180.2 274.6,196.4 281.9,212.3 289.2,227.5 296.5,241.6 303.8,254.4 311.1,265.5 318.4,274.6 325.6,281.5 332.9,286.0 340.2,288.1 347.5,287.8 354.8,285.0 362.1,279.9 369.3,272.6 376.6,263.3 383.9,252.3 391.2,239.8 398.5,226.1 405.8,211.5 413.0,196.5 420.3,181.4 427.6,166.5 434.9,152.3 442.2,138.9 449.4,126.8 456.7,116.2 464.0,107.3 471.3,100.4 478.6,95.5 485.9,92.8 493.1,92.2 500.4,93.9 507.7,97.7 515.0,103.4 522.3,111.0 529.6,120.2 536.9,130.8 544.1,142.5 551.4,154.9 558.7,167.9 566.0,181.1 573.3,194.0 580.5,206.6 587.8,218.3 595.1,229.0 602.4,238.4 609.7,246.4 617.0,252.6 624.2,257.0 631.5,259.5 638.8,260.1 646.1,258.7 653.4,255.4 660.7,250.4 668.0,243.7 675.2,235.5 682.5,226.1 689.8,215.7 697.1,204.5 704.4,192.8 711.6,181.0 718.9,169.2 726.2,157.8 733.5,147.0 740.8,137.2 748.1,128.4 755.4,121.0 762.6,115.0 769.9,110.7 777.2,108.0 784.5,107.1 791.8,107.9 799.0,110.4 806.3,114.5 813.6,120.1 820.9,127.0 828.2,135.1 835.5,144.1 842.8,153.9 850.0,164.1 857.3,174.6 864.6,185.0 871.9,195.1 879.2,204.7 886.5,213.6 893.7,221.5 901.0,228.2 908.3,233.7 915.6,237.7 922.9,240.3 930.1,241.3 937.4,240.8 944.7,238.8 952.0,235.3" fill="none" stroke="#0f766e" stroke-width="4"/>
+</svg></div>
+</section><section class="trace" data-trace="3" hidden>
+  <div class="chart"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-label="Tank level and setpoint under PI control over DCP">
+<style>text{font-family:Segoe UI,Arial,sans-serif;fill:#34445b}.axis{stroke:#748198;stroke-width:1.2}.grid{stroke:#e5eaf1;stroke-width:1}.tick{font-size:11px;fill:#637187}</style>
+<line x1="78" y1="362.0" x2="952" y2="362.0" class="grid"/>
+<text x="68" y="366.0" text-anchor="end" class="tick">14.9</text>
+<line x1="78" y1="283.5" x2="952" y2="283.5" class="grid"/>
+<text x="68" y="287.5" text-anchor="end" class="tick">27.2</text>
+<line x1="78" y1="205.0" x2="952" y2="205.0" class="grid"/>
+<text x="68" y="209.0" text-anchor="end" class="tick">39.6</text>
+<line x1="78" y1="126.5" x2="952" y2="126.5" class="grid"/>
+<text x="68" y="130.5" text-anchor="end" class="tick">51.9</text>
+<line x1="78" y1="48.0" x2="952" y2="48.0" class="grid"/>
+<text x="68" y="52.0" text-anchor="end" class="tick">64.2</text>
+<line x1="78.0" y1="48" x2="78.0" y2="362" class="grid"/>
+<text x="78.0" y="383" text-anchor="middle" class="tick">0</text>
+<line x1="223.7" y1="48" x2="223.7" y2="362" class="grid"/>
+<text x="223.7" y="383" text-anchor="middle" class="tick">20</text>
+<line x1="369.3" y1="48" x2="369.3" y2="362" class="grid"/>
+<text x="369.3" y="383" text-anchor="middle" class="tick">40</text>
+<line x1="515.0" y1="48" x2="515.0" y2="362" class="grid"/>
+<text x="515.0" y="383" text-anchor="middle" class="tick">60</text>
+<line x1="660.7" y1="48" x2="660.7" y2="362" class="grid"/>
+<text x="660.7" y="383" text-anchor="middle" class="tick">80</text>
+<line x1="806.3" y1="48" x2="806.3" y2="362" class="grid"/>
+<text x="806.3" y="383" text-anchor="middle" class="tick">100</text>
+<line x1="952.0" y1="48" x2="952.0" y2="362" class="grid"/>
+<text x="952.0" y="383" text-anchor="middle" class="tick">120</text>
+<line x1="78" y1="48" x2="78" y2="362" class="axis"/>
+<line x1="78" y1="362" x2="952" y2="362" class="axis"/>
+<text x="515.0" y="405" text-anchor="middle">Time (s)</text>
+<text transform="translate(23 210.0) rotate(-90)" text-anchor="middle">Tank level (cm)</text>
+<line x1="78" y1="183.2" x2="952" y2="183.2" stroke="#526277" stroke-width="1.6" stroke-dasharray="5 6"/>
+<polyline points="78.0,202.3 85.3,199.5 92.6,196.8 99.8,194.3 107.1,191.9 114.4,189.6 121.7,187.4 129.0,185.4 136.3,183.4 143.6,181.5 150.8,179.7 158.1,178.0 165.4,176.2 172.7,174.4 180.0,172.6 187.2,170.7 194.5,168.9 201.8,167.1 209.1,165.3 216.4,163.5 223.7,161.6 230.9,159.8 238.2,158.4 245.5,157.3 252.8,156.7 260.1,156.3 267.4,156.3 274.6,156.6 281.9,157.1 289.2,157.9 296.5,158.9 303.8,160.2 311.1,161.7 318.4,163.4 325.6,165.3 332.9,167.4 340.2,169.8 347.5,172.3 354.8,175.1 362.1,178.1 369.3,181.3 376.6,184.7 383.9,188.4 391.2,192.2 398.5,196.0 405.8,199.9 413.0,203.8 420.3,207.7 427.6,211.4 434.9,215.1 442.2,218.5 449.4,221.7 456.7,224.8 464.0,227.5 471.3,230.0 478.6,232.2 485.9,234.0 493.1,235.5 500.4,236.6 507.7,237.3 515.0,237.5 522.3,237.3 529.6,236.6 536.9,235.3 544.1,233.6 551.4,231.3 558.7,228.4 566.0,225.1 573.3,221.2 580.5,216.9 587.8,212.1 595.1,206.8 602.4,201.2 609.7,195.2 617.0,188.8 624.2,182.2 631.5,175.4 638.8,168.4 646.1,161.2 653.4,154.0 660.7,146.8 668.0,139.7 675.2,132.6 682.5,125.7 689.8,119.1 697.1,112.9 704.4,107.0 711.6,101.6 718.9,96.7 726.2,92.5 733.5,88.9 740.8,86.1 748.1,84.0 755.4,82.7 762.6,82.3 769.9,82.9 777.2,84.3 784.5,86.7 791.8,90.1 799.0,94.4 806.3,99.7 813.6,106.0 820.9,113.2 828.2,121.3 835.5,130.2 842.8,140.0 850.0,150.6 857.3,161.9 864.6,173.8 871.9,186.2 879.2,199.1 886.5,212.3 893.7,225.8 901.0,239.4 908.3,253.0 915.6,266.5 922.9,279.7 930.1,292.6 937.4,304.9 944.7,316.7 952.0,327.7" fill="none" stroke="#0f766e" stroke-width="4"/>
+</svg></div>
+</section>
+  <p class="note">The vertical scale adjusts to the selected delay. Signal delay is simulated in both directions, on the level measurement and on the PI command.</p>
+</section>
+</main><script>
+const delayInput = document.getElementById("delay");
+const traces = [...document.querySelectorAll("[data-trace]")];
+function selectDelay(index) {
+  const option = delayInput.options[index];
+  traces.forEach(trace => { trace.hidden = trace.dataset.trace !== String(index); });
+  const delay = Number(option.value);
+  document.getElementById("direction").textContent = delay ? `${delay} s / direction` : "0 s · no delay";
+}
+delayInput.addEventListener("change", () => selectDelay(delayInput.selectedIndex));
+selectDelay(0);
+</script></body></html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dcpSlaveDescription dcpMajorVersion="1" dcpMinorVersion="0" dcpSlaveName="TankPlant" uuid="1142a519-4294-4b7d-a0e8-80fd4b6b7d1c" description="Tank FMI 2.0 FMU exposed as a DCP 1.0 NRT slave. The adapter maps u to qIn using qIn=0.001*u." author="DecentraLabs educational example" version="1.0.0" generationTool="DecentraLabs local DCP tank demo" variableNamingConvention="flat">
+  <OpMode><NonRealTime defaultSteps="1" fixedSteps="true"/></OpMode>
+  <UnitDefinitions>
+    <Unit name="1"><BaseUnit/></Unit>
+    <Unit name="m"><BaseUnit m="1"/></Unit>
+    <Unit name="m2"><BaseUnit m="2"/></Unit>
+    <Unit name="m2/s"><BaseUnit m="2" s="-1"/></Unit>
+  </UnitDefinitions>
+  <TimeRes><Resolution numerator="1" denominator="1" fixed="true" recommended="true"/></TimeRes>
+  <TransportProtocols>
+    <UDP_IPv4 maxPduSize="65507">
+      <Control host="127.0.0.1" port="55202"/>
+      <DAT_input_output host="127.0.0.1"><AvailablePortRange from="55101" to="55102"/></DAT_input_output>
+      <DAT_parameter host="127.0.0.1"><AvailablePortRange from="55101" to="55102"/></DAT_parameter>
+    </UDP_IPv4>
+  </TransportProtocols>
+  <CapabilityFlags canAcceptConfigPdus="true" canHandleReset="true" canHandleVariableSteps="false" canMonitorHeartbeat="false"/>
+  <Variables>
+    <Variable name="u" valueReference="1" description="Dimensionless controller command received from the controller DCP slave." variability="continuous">
+      <Input><Float64 start="0.245" unit="1"/></Input>
+    </Variable>
+    <Variable name="h" valueReference="2" description="Tank liquid level fed back to the controller, in metres." variability="continuous">
+      <Output><Float64 start="0.40" unit="m"/></Output>
+    </Variable>
+    <Variable name="A" valueReference="3" description="Tank cross-sectional area, in square metres." variability="fixed">
+      <Parameter><Float64 start="0.01" unit="m2"/></Parameter>
+    </Variable>
+    <Variable name="k" valueReference="4" description="Outflow coefficient, in square metres per second." variability="fixed">
+      <Parameter><Float64 start="0.0005" unit="m2/s"/></Parameter>
+    </Variable>
+    <Variable name="h0" valueReference="5" description="Initial liquid level, in metres." variability="fixed">
+      <Parameter><Float64 start="0.40" unit="m"/></Parameter>
+    </Variable>
+  </Variables>
+</dcpSlaveDescription>

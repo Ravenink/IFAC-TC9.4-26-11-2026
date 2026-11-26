@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dcpSlaveDescription dcpMajorVersion="1" dcpMinorVersion="0" dcpSlaveName="TankLevelController" uuid="8e77346c-6274-4f01-86ed-0f077b4d2511" description="PI controller FMI 2.0 FMU exposed as a DCP 1.0 NRT slave." author="DecentraLabs educational example" version="1.0.0" generationTool="DecentraLabs local DCP tank demo" variableNamingConvention="flat">
+  <OpMode><NonRealTime defaultSteps="1" fixedSteps="true"/></OpMode>
+  <UnitDefinitions>
+    <Unit name="1"><BaseUnit/></Unit>
+    <Unit name="m"><BaseUnit m="1"/></Unit>
+    <Unit name="1/s"><BaseUnit s="-1"/></Unit>
+  </UnitDefinitions>
+  <TimeRes><Resolution numerator="1" denominator="1" fixed="true" recommended="true"/></TimeRes>
+  <TransportProtocols>
+    <UDP_IPv4 maxPduSize="65507">
+      <Control host="127.0.0.1" port="55201"/>
+      <DAT_input_output host="127.0.0.1"><AvailablePortRange from="55101" to="55102"/></DAT_input_output>
+      <DAT_parameter host="127.0.0.1"><AvailablePortRange from="55101" to="55102"/></DAT_parameter>
+    </UDP_IPv4>
+  </TransportProtocols>
+  <CapabilityFlags canAcceptConfigPdus="true" canHandleReset="true" canHandleVariableSteps="false" canMonitorHeartbeat="false"/>
+  <Variables>
+    <Variable name="y" valueReference="1" description="Measured tank level fed back from the tank, in metres." variability="continuous">
+      <Input><Float64 start="0.40" unit="m"/></Input>
+    </Variable>
+    <Variable name="u" valueReference="2" description="Dimensionless controller output; the tank adapter converts it to qIn using qIn=0.001*u." variability="continuous">
+      <Output><Float64 start="0.245" unit="1"/></Output>
+    </Variable>
+    <Variable name="r" valueReference="3" description="Level reference configured by the DCP master for this run, in metres." variability="fixed">
+      <Parameter><Float64 start="0.43" unit="m"/></Parameter>
+    </Variable>
+    <Variable name="Kp" valueReference="4" description="Proportional gain passed to the controller FMU." variability="fixed">
+      <Parameter><Float64 start="1.5" unit="1"/></Parameter>
+    </Variable>
+    <Variable name="uBias" valueReference="5" description="Controller output bias passed to the controller FMU." variability="fixed">
+      <Parameter><Float64 start="0.2" unit="1"/></Parameter>
+    </Variable>
+    <Variable name="Ki" valueReference="6" description="Integral gain passed to the controller FMU, per second." variability="fixed">
+      <Parameter><Float64 start="0.05" unit="1/s"/></Parameter>
+    </Variable>
+  </Variables>
+</dcpSlaveDescription>

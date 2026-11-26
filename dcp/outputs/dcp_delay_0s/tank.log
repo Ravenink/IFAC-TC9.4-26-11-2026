@@ -1,0 +1,30 @@
+[Tank] waiting for DCP master on 127.0.0.1:55202
+[Tank] DCP state CONFIGURATION
+[Tank] DCP state PREPARING
+[Tank] DCP state PREPARED
+[Tank] DCP state CONFIGURING
+[Tank] configured
+[Tank] DCP state CONFIGURED
+[Tank] DCP state INITIALIZING
+[Tank] Tank FMU initialized
+[Tank] DCP state INITIALIZED
+[Tank] DCP state SENDING_I
+[Tank] DCP state CONFIGURED
+[Tank] DCP state SYNCHRONIZING
+[Tank] DCP state SYNCHRONIZED
+[Tank] t=10 s, qIn=0.00022054 m3/s, h=0.423068 m
+[Tank] t=20 s, qIn=0.000215531 m3/s, h=0.427268 m
+[Tank] t=30 s, qIn=0.000214828 m3/s, h=0.428347 m
+[Tank] t=40 s, qIn=0.000214782 m3/s, h=0.428828 m
+[Tank] t=50 s, qIn=0.000214823 m3/s, h=0.429136 m
+[Tank] t=60 s, qIn=0.000214866 m3/s, h=0.429357 m
+[Tank] t=70 s, qIn=0.0002149 m3/s, h=0.429521 m
+[Tank] t=80 s, qIn=0.000214925 m3/s, h=0.429643 m
+[Tank] t=90 s, qIn=0.000214944 m3/s, h=0.429734 m
+[Tank] t=100 s, qIn=0.000214958 m3/s, h=0.429801 m
+[Tank] t=110 s, qIn=0.000214969 m3/s, h=0.429852 m
+[Tank] t=120 s, qIn=0.000214977 m3/s, h=0.42989 m
+[Tank] DCP state STOPPING
+[Tank] DCP state STOPPED
+[Tank] DCP state ALIVE
+[Tank] stopped

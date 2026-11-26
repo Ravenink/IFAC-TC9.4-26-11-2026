@@ -220,6 +220,14 @@ def write_comparison_csv(file, p_run, pi_run):
                          for t, hp, qp, hpi, qpi in zip(time_p, level_p, flow_p, level_pi, flow_pi))
 
 
+def write_level_csv(file, result):
+    time, level, _ = result
+    with file.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(("time_s", "h_m"))
+        writer.writerows(zip(time, level))
+
+
 def plot_comparison(plt, p_run, pi_run, h_ref, kp, ki, output):
     time_p, level_p, flow_p = p_run
     time_pi, level_pi, flow_pi = pi_run
@@ -257,6 +265,8 @@ def main():
     parser.add_argument("--kp", type=float, help="override Kp from Controller.ssv for both runs")
     parser.add_argument("--ki", type=float, help="override Ki from Controller.ssv for the PI run")
     parser.add_argument("--output", type=Path, metavar="DIR", help="save a PNG figure and comparison CSV")
+    parser.add_argument("--ssp-reference", type=Path, metavar="CSV",
+                        help="save the P-control level trace as time_s,h_m for a protocol comparison")
     parser.add_argument("--csv-only", action="store_true", help="save CSV samples without plotting")
     parser.add_argument("--no-show", action="store_true", help="run without opening a plot window")
     args = parser.parse_args()
@@ -297,9 +307,12 @@ def run(args):
     if args.output is not None:
         args.output.mkdir(parents=True, exist_ok=True)
         write_comparison_csv(args.output / "tank_P_vs_PI.csv", p_run, pi_run)
+    if args.ssp_reference is not None:
+        args.ssp_reference.parent.mkdir(parents=True, exist_ok=True)
+        write_level_csv(args.ssp_reference, p_run)
     if args.csv_only or (args.no_show and args.output is None):
-        if args.csv_only and args.output is None:
-            raise ValueError("--csv-only requires --output DIR.")
+        if args.csv_only and args.output is None and args.ssp_reference is None:
+            raise ValueError("--csv-only requires --output DIR or --ssp-reference CSV.")
         return
     import matplotlib
 

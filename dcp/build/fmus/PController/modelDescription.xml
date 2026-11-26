@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<fmiModelDescription fmiVersion="2.0" modelName="PController" guid="{dd60dd62-4273-4d99-a069-9019b4743b53}" generationTool="Tank level teaching example" variableNamingConvention="flat" numberOfEventIndicators="0">
+  <CoSimulation modelIdentifier="PController" canHandleVariableCommunicationStepSize="true"/>
+  <UnitDefinitions>
+    <Unit name="1">
+      <BaseUnit/>
+    </Unit>
+  </UnitDefinitions>
+  <DefaultExperiment startTime="0" stopTime="120" stepSize="1"/>
+  <ModelVariables>
+    <ScalarVariable name="r" valueReference="0" causality="input" variability="continuous">
+      <Real unit="1" start="0"/>
+    </ScalarVariable>
+    <ScalarVariable name="y" valueReference="1" causality="input" variability="continuous">
+      <Real unit="1" start="0"/>
+    </ScalarVariable>
+    <ScalarVariable name="u" valueReference="2" causality="output" variability="continuous" initial="calculated">
+      <Real unit="1"/>
+    </ScalarVariable>
+    <ScalarVariable name="Kp" valueReference="3" causality="parameter" variability="fixed" initial="exact">
+      <Real unit="1" start="1"/>
+    </ScalarVariable>
+    <ScalarVariable name="uBias" valueReference="4" causality="parameter" variability="fixed" initial="exact">
+      <Real unit="1" start="0"/>
+    </ScalarVariable>
+  </ModelVariables>
+  <ModelStructure>
+    <Outputs>
+      <Unknown index="3" dependencies="1 2"/>
+    </Outputs>
+    <InitialUnknowns>
+      <Unknown index="3" dependencies="1 2 4 5"/>
+    </InitialUnknowns>
+  </ModelStructure>
+</fmiModelDescription>

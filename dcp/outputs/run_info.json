@@ -1,0 +1,50 @@
+{
+    "host":  "127.0.0.1",
+    "duration_s":  120,
+    "reference_m":  0.43,
+    "controllerFmu":  "../PIController.fmu",
+    "dcpCommunicationStep_s":  1,
+    "dcpDelayMeaning":  "Simulated one-way signal delay, applied to feedback and command at each exchange.",
+    "dcpRuns":  [
+                    {
+                        "delaySeconds":  0,
+                        "oneWayDelaySeconds":  0,
+                        "roundTripSignalDelaySeconds":  0,
+                        "communicationStepSeconds":  1,
+                        "exchanges":  120,
+                        "masterPid":  41652,
+                        "controllerPid":  41316,
+                        "tankPid":  20156
+                    },
+                    {
+                        "delaySeconds":  2,
+                        "oneWayDelaySeconds":  2,
+                        "roundTripSignalDelaySeconds":  4,
+                        "communicationStepSeconds":  1,
+                        "exchanges":  120,
+                        "masterPid":  33136,
+                        "controllerPid":  23048,
+                        "tankPid":  15504
+                    },
+                    {
+                        "delaySeconds":  5,
+                        "oneWayDelaySeconds":  5,
+                        "roundTripSignalDelaySeconds":  10,
+                        "communicationStepSeconds":  1,
+                        "exchanges":  120,
+                        "masterPid":  31116,
+                        "controllerPid":  41188,
+                        "tankPid":  27916
+                    },
+                    {
+                        "delaySeconds":  10,
+                        "oneWayDelaySeconds":  10,
+                        "roundTripSignalDelaySeconds":  20,
+                        "communicationStepSeconds":  1,
+                        "exchanges":  120,
+                        "masterPid":  21032,
+                        "controllerPid":  10652,
+                        "tankPid":  39408
+                    }
+                ]
+}

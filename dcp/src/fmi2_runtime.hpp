@@ -17,7 +17,7 @@
 namespace fmi2demo {
 
 using Status = int;
-using Boolean = char;
+using Boolean = int;
 using ValueReference = std::uint32_t;
 using Real = double;
 using Component = void*;

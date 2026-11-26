@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<fmiModelDescription fmiVersion="2.0" modelName="Tank" guid="{8a7f36e7-aeab-4ac5-9691-1d3726b381d5}" generationTool="Tank level teaching example" variableNamingConvention="flat" numberOfEventIndicators="0">
+  <CoSimulation modelIdentifier="Tank" canHandleVariableCommunicationStepSize="true"/>
+  <UnitDefinitions>
+    <Unit name="m">
+      <BaseUnit m="1"/>
+    </Unit>
+    <Unit name="m2">
+      <BaseUnit m="2"/>
+    </Unit>
+    <Unit name="m2/s">
+      <BaseUnit m="2" s="-1"/>
+    </Unit>
+    <Unit name="m3/s">
+      <BaseUnit m="3" s="-1"/>
+    </Unit>
+  </UnitDefinitions>
+  <DefaultExperiment startTime="0" stopTime="120" stepSize="1"/>
+  <ModelVariables>
+    <ScalarVariable name="qIn" valueReference="0" causality="input" variability="continuous">
+      <Real unit="m3/s" start="0.0002"/>
+    </ScalarVariable>
+    <ScalarVariable name="h" valueReference="1" causality="output" variability="continuous" initial="calculated">
+      <Real unit="m"/>
+    </ScalarVariable>
+    <ScalarVariable name="A" valueReference="2" causality="parameter" variability="fixed" initial="exact">
+      <Real unit="m2" start="0.01"/>
+    </ScalarVariable>
+    <ScalarVariable name="k" valueReference="3" causality="parameter" variability="fixed" initial="exact">
+      <Real unit="m2/s" start="0.0005"/>
+    </ScalarVariable>
+    <ScalarVariable name="h0" valueReference="4" causality="parameter" variability="fixed" initial="exact">
+      <Real unit="m" start="0.4"/>
+    </ScalarVariable>
+  </ModelVariables>
+  <ModelStructure>
+    <Outputs>
+      <Unknown index="2" dependencies=""/>
+    </Outputs>
+    <InitialUnknowns>
+      <Unknown index="2" dependencies="5"/>
+    </InitialUnknowns>
+  </ModelStructure>
+</fmiModelDescription>

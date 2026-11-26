@@ -48,13 +48,11 @@ if ($needsBuild) {
 
 python .\prepare_demo.py
 if ($LASTEXITCODE -ne 0) { throw 'The FMU files could not be prepared.' }
-python -c 'import fmpy' *> $null
-if ($LASTEXITCODE -ne 0) { throw 'The SSP reference needs FMPy. Install it with: python -m pip install fmpy' }
 
 $output = if ([System.IO.Path]::IsPathRooted($OutputFolder)) { $OutputFolder } else { Join-Path $root $OutputFolder }
 New-Item -ItemType Directory -Force -Path $output | Out-Null
 $output = (Resolve-Path -LiteralPath $output).Path
-$controllerFmu = Join-Path $root 'build\fmus\PController'
+$controllerFmu = Join-Path $root 'build\fmus\PIController'
 $tankFmu = Join-Path $root 'build\fmus\Tank'
 $referenceText = $Reference.ToString('R', [Globalization.CultureInfo]::InvariantCulture)
 $runRecords = @()
@@ -157,35 +155,15 @@ foreach ($delay in $DelaySeconds) {
     }
 }
 
-# These local SSP cases are the reference runs: H=1 s and H=10 s.
-$sspOutput = Join-Path $output 'ssp'
-New-Item -ItemType Directory -Force -Path $sspOutput | Out-Null
-$sspOutput = (Resolve-Path -LiteralPath $sspOutput).Path
-$parent = Split-Path -Parent $root
-$sspRunner = Join-Path $parent 'demo_tank_controller.py'
-$sspPackage = Join-Path $parent 'TankController.ssp'
-$sspReferenceCm = ($Reference * 100).ToString('R', [Globalization.CultureInfo]::InvariantCulture)
-$sspArgs = @($sspRunner, 'run', '--ssp', $sspPackage, '--duration', [string]$Duration,
-    '--step', '1', '--step', '10', '--href-cm', $sspReferenceCm, '--output', $sspOutput, '--csv-only')
-& python @sspArgs
-if ($LASTEXITCODE -ne 0) { throw 'The local SSP reference runs failed.' }
-foreach ($h in @(1, 10)) {
-    $sspCsv = Join-Path $sspOutput ('closed_loop_{0}_H{1}s.csv' -f $(if ($h -eq 1) { 1 } else { 2 }), $h)
-    if (!(Test-Path -LiteralPath $sspCsv)) { throw "The SSP H=$h s reference did not create its CSV." }
-    $sspRows = @(Import-Csv -LiteralPath $sspCsv).Count
-    $expectedRows = [int][Math]::Ceiling($Duration / $h) + 1
-    if ($sspRows -ne $expectedRows) { throw "SSP H=$h s run ended before writing all expected samples." }
-}
-
 $runInfo = [ordered]@{
     host = '127.0.0.1'
     duration_s = $Duration
     reference_m = $Reference
+    controllerFmu = '../PIController.fmu'
     dcpCommunicationStep_s = 1
     dcpDelayMeaning = 'Simulated one-way signal delay, applied to feedback and command at each exchange.'
     dcpRuns = $runRecords
-    sspRuns = @(@{ h = 1 }, @{ h = 10 })
 }
 $runInfo | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $output 'run_info.json') -Encoding ASCII
 python .\plot_results.py --folder "$output"
-if ($LASTEXITCODE -ne 0) { throw 'The interactive comparison panel could not be generated.' }
+if ($LASTEXITCODE -ne 0) { throw 'The interactive DCP results could not be generated.' }

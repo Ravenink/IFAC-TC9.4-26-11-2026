@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\ldela\OneDrive - UNED\Desktop\Webinar IFAC\DCP\build\windows\CMakeFiles\81d9224fadc5cff2cc89f5976f27e27e\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{CDA0DF30-AA38-3A86-9F6B-174E01A0DC45}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

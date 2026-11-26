@@ -1,0 +1,30 @@
+[Controller] waiting for DCP master on 127.0.0.1:55201
+[Controller] DCP state CONFIGURATION
+[Controller] DCP state PREPARING
+[Controller] DCP state PREPARED
+[Controller] DCP state CONFIGURING
+[Controller] configured
+[Controller] DCP state CONFIGURED
+[Controller] DCP state INITIALIZING
+[Controller] PIController FMU initialized
+[Controller] DCP state INITIALIZED
+[Controller] DCP state SENDING_I
+[Controller] DCP state CONFIGURED
+[Controller] DCP state SYNCHRONIZING
+[Controller] DCP state SYNCHRONIZED
+[Controller] t=10 s, y=0.426719 m, u=0.214894
+[Controller] t=20 s, y=0.42839 m, u=0.212412
+[Controller] t=30 s, y=0.427323 m, u=0.21543
+[Controller] t=40 s, y=0.428561 m, u=0.214527
+[Controller] t=50 s, y=0.428804 m, u=0.214821
+[Controller] t=60 s, y=0.42913 m, u=0.214848
+[Controller] t=70 s, y=0.429355 m, u=0.214884
+[Controller] t=80 s, y=0.42952 m, u=0.214916
+[Controller] t=90 s, y=0.429644 m, u=0.214937
+[Controller] t=100 s, y=0.429736 m, u=0.214953
+[Controller] t=110 s, y=0.429804 m, u=0.214965
+[Controller] t=120 s, y=0.429855 m, u=0.214974
+[Controller] DCP state STOPPING
+[Controller] DCP state STOPPED
+[Controller] DCP state ALIVE
+[Controller] stopped
